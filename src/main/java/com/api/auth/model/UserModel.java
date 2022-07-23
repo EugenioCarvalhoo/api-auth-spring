@@ -27,7 +27,7 @@ public class UserModel {
     private String userName;
     private String password;
     @ManyToMany(fetch = FetchType.EAGER)
-    private List<RuleModel> roles  = new ArrayList<>();
+    private List<RoleModel> roles  = new ArrayList<>();
 
     UserModel() {}
 

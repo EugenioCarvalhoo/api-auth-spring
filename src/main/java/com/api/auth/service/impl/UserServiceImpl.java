@@ -13,6 +13,7 @@ import com.api.auth.model.RoleModel;
 import com.api.auth.model.UserModel;
 import com.api.auth.repository.RoleRepository;
 import com.api.auth.repository.UserRepository;
+import com.api.auth.request.RoleToUserRequest;
 import com.api.auth.service.UserService;
 
 import lombok.extern.slf4j.Slf4j;
@@ -37,11 +38,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void addRoleToUser(String userName, String roleName) {
-        UserModel user = userRepo.findByUserName(userName)
+    public void addRoleToUser(RoleToUserRequest roleToUser) {
+        UserModel user = userRepo.findByUserName(roleToUser.getUserName())
         .orElseThrow(() -> { throw new EntityException(); });
 
-        RoleModel role =  roleRepo.findByName(roleName)
+        RoleModel role =  roleRepo.findByName(roleToUser.getRoleName())
         .orElseThrow(() -> { throw new EntityException(); });
         
         user.getRoles().add(role);
@@ -54,9 +55,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserModel> getUser() {
-        // TODO Auto-generated method stub
-        return null;
+    public List<UserModel> getUsers() {
+        return userRepo.findAll();
     }
     
 }
