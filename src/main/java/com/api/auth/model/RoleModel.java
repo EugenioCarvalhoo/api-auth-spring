@@ -9,10 +9,12 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Entity
-@Table( name = "user")
+@Table( name = "role")
 @Data
 @AllArgsConstructor
 public class RoleModel {
+
+    RoleModel() {}
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
