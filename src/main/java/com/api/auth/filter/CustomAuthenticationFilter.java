@@ -2,7 +2,8 @@ package com.api.auth.filter;
 
 import java.io.IOException;
 import java.util.Date;
-import java.util.stream.Collector;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.servlet.FilterChain;
@@ -17,10 +18,10 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.stereotype.Component;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
@@ -49,8 +50,12 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
         User user = (User) authResult.getPrincipal();
         String accesToken = createJWT(request, user, accesTokenExpiresAtMinutes);
         String refreshToken = createJWT(request, user, refreshTokenExpiresAtMinutes);
-        response.setHeader("accesToken", accesToken);
-        response.setHeader("refreshToken", refreshToken);
+        
+        Map<String, String> tokens = new HashMap<>();
+        tokens.put("accesToken", accesToken);
+        tokens.put("refreshToken", refreshToken);
+        response.setContentType("application/json");
+        new ObjectMapper().writeValue(response.getOutputStream(), tokens);
     }
 
     private String createJWT(HttpServletRequest request, User user, Integer minutes) {
