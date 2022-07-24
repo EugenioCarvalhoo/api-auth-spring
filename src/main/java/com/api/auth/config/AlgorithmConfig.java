@@ -1,11 +1,11 @@
-package com.api.auth.filter;
+package com.api.auth.config;
 
 import org.springframework.stereotype.Component;
 
 import com.auth0.jwt.algorithms.Algorithm;
 
 @Component
-public class CustomAlgorithm {
+public class AlgorithmConfig {
     
     private String secretAlgorithm = "secret";
 

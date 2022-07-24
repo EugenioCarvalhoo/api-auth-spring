@@ -20,6 +20,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import com.api.auth.config.AlgorithmConfig;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -27,10 +28,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     private Integer accesTokenExpiresAtMinutes = 10;
     private Integer refreshTokenExpiresAtMinutes = 30;
-    private final CustomAlgorithm customAlgorithm; 
+    private final AlgorithmConfig customAlgorithm; 
     private final AuthenticationManager authenticationManager;
 
-    public CustomAuthenticationFilter(AuthenticationManager authenticationManager, CustomAlgorithm customAlgorithm) {
+    public CustomAuthenticationFilter(AuthenticationManager authenticationManager, AlgorithmConfig customAlgorithm) {
         this.authenticationManager = authenticationManager;
         this.customAlgorithm =customAlgorithm;
     }

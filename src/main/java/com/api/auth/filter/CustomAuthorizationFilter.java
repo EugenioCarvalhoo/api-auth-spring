@@ -20,6 +20,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.api.auth.config.AlgorithmConfig;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.interfaces.DecodedJWT;
@@ -27,9 +28,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class CustomAuthorizationFilter extends OncePerRequestFilter {
 
-    private final CustomAlgorithm customAlgorithm;
+    private final AlgorithmConfig customAlgorithm;
 
-    public CustomAuthorizationFilter(CustomAlgorithm customAlgorithm) {
+    public CustomAuthorizationFilter(AlgorithmConfig customAlgorithm) {
         this.customAlgorithm = customAlgorithm;
     }
 
@@ -72,8 +73,7 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
                 error.put("error_message", e.getMessage());
                 response.setContentType("application/json");
                 new ObjectMapper().writeValue(response.getOutputStream(), error);
-                
-
+            
             }
         } else {
             filterChain.doFilter(request, response);
