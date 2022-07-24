@@ -11,6 +11,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -24,15 +25,14 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
-
-    private String secretAlgorithm = "secret";
     private Integer accesTokenExpiresAtMinutes = 10;
     private Integer refreshTokenExpiresAtMinutes = 30;
-    
+    private final CustomAlgorithm customAlgorithm; 
     private final AuthenticationManager authenticationManager;
 
-    public CustomAuthenticationFilter(AuthenticationManager authenticationManager) {
+    public CustomAuthenticationFilter(AuthenticationManager authenticationManager, CustomAlgorithm customAlgorithm) {
         this.authenticationManager = authenticationManager;
+        this.customAlgorithm =customAlgorithm;
     }
        
     @Override
@@ -59,7 +59,6 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
     }
 
     private String createJWT(HttpServletRequest request, User user, Integer minutes) {
-        Algorithm algorithm = Algorithm.HMAC256(secretAlgorithm.getBytes());
         return JWT.create()
         .withSubject(user.getUsername())
         .withClaim("roles", user.getAuthorities()
@@ -68,6 +67,6 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
         .withExpiresAt(new Date(
             System.currentTimeMillis() + minutes * 60 * 1000
         ))
-        .sign(algorithm);
+        .sign(customAlgorithm.getAlgorithm());
     }
 }
