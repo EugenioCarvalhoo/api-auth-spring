@@ -10,6 +10,6 @@ public class AlgorithmConfig {
     private String secretAlgorithm = "secret";
 
     public Algorithm getAlgorithm() {
-        return Algorithm.HMAC256(secretAlgorithm.getBytes());
+        return Algorithm.HMAC256("secret".getBytes());
     }
 }

@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.api.auth.dto.UserDTO;
 import com.api.auth.exception.EntityException;
 import com.api.auth.model.RoleModel;
 import com.api.auth.model.UserModel;
@@ -28,9 +29,9 @@ public class UserServiceImpl implements UserService{
     PasswordEncoder passwordEncoder;
 
     @Override
-    public UserModel saveUser(UserModel user) {
+    public UserModel saveUser(UserDTO user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        return userRepo.save(user);
+        return userRepo.save(user.parseModel());
     }
 
     @Override

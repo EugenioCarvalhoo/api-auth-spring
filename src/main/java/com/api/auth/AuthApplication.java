@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import com.api.auth.dto.UserDTO;
 import com.api.auth.model.RoleModel;
 import com.api.auth.model.UserModel;
 import com.api.auth.request.RoleToUserRequest;
@@ -28,17 +29,28 @@ public class AuthApplication {
 
 	@Bean
 	CommandLineRunner run(UserService userService) {
-		return	run -> {
+		return run -> {
 			userService.saveRole(new RoleModel(null, "ROLE_USER"));
 			userService.saveRole(new RoleModel(null, "ROLE_MANAGER"));
 			userService.saveRole(new RoleModel(null, "ROLE_ADMIN"));
-			
-			userService.saveUser(
-				new UserModel(null, "Carlos da silva",
-				 "Carlos", "carlos123", new ArrayList<>()));
+
+			UserDTO user1 =  new UserDTO();
+			user1.setName("Carlos da Silva");
+			user1.setUserName("carlos");
+			user1.setPassword("123");
+			userService.saveUser(user1);
+
+			UserDTO user2 =  new UserDTO();
+			user2.setName("Angela do Santos Souza");
+			user2.setUserName("angela");
+			user2.setPassword("123ad");
+			userService.saveUser(user2);
 
 			userService.addRoleToUser(
-				new RoleToUserRequest("Carlos", "ROLE_USER"));
+					new RoleToUserRequest("angela", "ROLE_USER"));
+
+			userService.addRoleToUser(
+					new RoleToUserRequest("carlos", "ROLE_ADMIN"));
 		};
 	}
 

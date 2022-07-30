@@ -2,6 +2,7 @@ package com.api.auth.service;
 
 import java.util.List;
 
+import com.api.auth.dto.UserDTO;
 import com.api.auth.model.RoleModel;
 import com.api.auth.model.UserModel;
 import com.api.auth.request.RoleToUserRequest;
@@ -9,7 +10,7 @@ import com.api.auth.request.RoleToUserRequest;
 
 public interface UserService {
 
-    UserModel saveUser(UserModel user);
+    UserModel saveUser(UserDTO user);
     
     RoleModel saveRole(RoleModel role);
     

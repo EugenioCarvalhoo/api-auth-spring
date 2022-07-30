@@ -32,5 +32,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         
        return new User(user.getUserName(), user.getPassword(),authorities);
     }
+
+    
     
 }

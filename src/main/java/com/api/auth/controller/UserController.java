@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.api.auth.dto.UserDTO;
 import com.api.auth.model.RoleModel;
 import com.api.auth.model.UserModel;
 import com.api.auth.request.RoleToUserRequest;
@@ -46,9 +47,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.api.auth.config.AlgorithmConfig;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
+import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.core.exc.StreamWriteException;
 import com.fasterxml.jackson.databind.DatabindException;
@@ -60,18 +61,15 @@ public class UserController {
 
     @Autowired
     UserService userService;
-    
-    @Autowired
-    AlgorithmConfig customAlgorithm;
 
     @PostMapping("/user/save")
-    public ResponseEntity<UserModel> saveUser(UserModel user) {
+    public ResponseEntity<UserModel> saveUser(@RequestBody UserDTO user) {
         return ResponseEntity.created(getURI("/v1/user/save"))
                 .body(userService.saveUser(user));
     }
 
-    @PostMapping("/v1/role/save")
-    public ResponseEntity<RoleModel> saveRole(RoleModel role) {
+    @PostMapping("/role/save")
+    public ResponseEntity<RoleModel> saveRole(@RequestBody RoleModel role) {
         return ResponseEntity.created(getURI("/v1/role/save"))
                 .body(userService.saveRole(role));
     }
@@ -83,19 +81,13 @@ public class UserController {
                 .build();
     }
 
-    @PutMapping("/role/addtoUser")
-    public ResponseEntity<?> refreshToken(@RequestBody RoleToUserRequest roleToUser) {
-        userService.addRoleToUser(roleToUser);
-        return ResponseEntity.ok()
-                .build();
-    }
 
     @GetMapping("/users")
     public ResponseEntity<List<UserModel>> getUsers() {
         return ResponseEntity.ok().body(userService.getUsers());
     }
 
-    @GetMapping("/token/refresh_token")
+    @GetMapping("/token/refresh")
     public void refreshToken(
             HttpServletRequest request, HttpServletResponse response) throws StreamWriteException, DatabindException, IOException {
         String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
@@ -105,7 +97,7 @@ public class UserController {
             try {
 
                 String refreshToken = authorizationHeader.substring(bearer.length());
-                JWTVerifier verifier = JWT.require(customAlgorithm.getAlgorithm()).build();
+                JWTVerifier verifier = JWT.require(Algorithm.HMAC256("secret".getBytes())).build();
                 DecodedJWT decodedJWT = verifier.verify(refreshToken);
                 String username = decodedJWT.getSubject();
                 UserModel user = userService.getUser(username);
@@ -146,6 +138,6 @@ public class UserController {
         .withExpiresAt(new Date(
             System.currentTimeMillis() + minutes * 60 * 1000
         ))
-        .sign(customAlgorithm.getAlgorithm());
+        .sign(Algorithm.HMAC256("secret".getBytes()));
     }
 }

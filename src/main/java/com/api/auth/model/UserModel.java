@@ -11,9 +11,12 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Setter;
 
 @Entity
 @Table( name = "user")
@@ -27,6 +30,7 @@ public class UserModel {
     private String userName;
     private String password;
     @ManyToMany(fetch = FetchType.EAGER)
+    @Setter(value = AccessLevel.PRIVATE)
     private List<RoleModel> roles  = new ArrayList<>();
 
     UserModel() {}
