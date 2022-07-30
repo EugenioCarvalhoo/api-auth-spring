@@ -1,52 +1,34 @@
 package com.api.auth.controller;
 
-import java.net.URI;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-
-import com.api.auth.dto.UserDTO;
-import com.api.auth.model.RoleModel;
-import com.api.auth.model.UserModel;
-import com.api.auth.request.RoleToUserRequest;
-import com.api.auth.service.UserService;
-
 import java.io.IOException;
-import java.util.Arrays;
+import java.net.URI;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.api.auth.dto.RoleDTO;
+import com.api.auth.dto.UserDTO;
+import com.api.auth.model.RoleModel;
+import com.api.auth.model.UserModel;
+import com.api.auth.request.RoleToUserRequest;
+import com.api.auth.service.UserService;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -63,13 +45,13 @@ public class UserController {
     UserService userService;
 
     @PostMapping("/user/save")
-    public ResponseEntity<UserModel> saveUser(@RequestBody UserDTO user) {
+    public ResponseEntity<UserDTO> saveUser(@RequestBody UserDTO user) {
         return ResponseEntity.created(getURI("/v1/user/save"))
                 .body(userService.saveUser(user));
     }
 
     @PostMapping("/role/save")
-    public ResponseEntity<RoleModel> saveRole(@RequestBody RoleModel role) {
+    public ResponseEntity<RoleDTO> saveRole(@RequestBody RoleDTO role) {
         return ResponseEntity.created(getURI("/v1/role/save"))
                 .body(userService.saveRole(role));
     }
@@ -83,7 +65,7 @@ public class UserController {
 
 
     @GetMapping("/users")
-    public ResponseEntity<List<UserModel>> getUsers() {
+    public ResponseEntity<List<UserDTO>> getUsers() {
         return ResponseEntity.ok().body(userService.getUsers());
     }
 
@@ -100,7 +82,7 @@ public class UserController {
                 JWTVerifier verifier = JWT.require(Algorithm.HMAC256("secret".getBytes())).build();
                 DecodedJWT decodedJWT = verifier.verify(refreshToken);
                 String username = decodedJWT.getSubject();
-                UserModel user = userService.getUser(username);
+                UserDTO user = userService.getUser(username);
                 String accesToken = createJWT( request, user, 10);
                 
                 Map<String, String> tokens = new HashMap<>();
@@ -129,11 +111,11 @@ public class UserController {
                 .path(path).toString());
     }
 
-    private String createJWT(HttpServletRequest request, UserModel user, Integer minutes) {
+    private String createJWT(HttpServletRequest request, UserDTO user, Integer minutes) {
         return JWT.create()
         .withSubject(user.getUserName())
         .withClaim("roles", user.getRoles()
-        .stream().map(RoleModel::getName).collect(Collectors.toList()))
+        .stream().map(RoleDTO::getName).collect(Collectors.toList()))
         .withIssuer(request.getRequestURL().toString())
         .withExpiresAt(new Date(
             System.currentTimeMillis() + minutes * 60 * 1000

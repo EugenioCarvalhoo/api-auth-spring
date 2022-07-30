@@ -1,7 +1,6 @@
 package com.api.auth.exception;
 
 import java.io.Serializable;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import org.springframework.http.HttpStatus;

@@ -36,7 +36,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
          http.csrf().disable();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-        http.authorizeRequests().antMatchers("/login/**", "/v1/token/refresh_token").permitAll();
+        http.authorizeRequests().antMatchers("/login/**", "/v1/token/refresh_token/**").permitAll();
         http.authorizeHttpRequests().antMatchers(HttpMethod.GET, "/v1/**")
         .hasAnyAuthority("ROLE_USER","ROLE_ADMIN");
         http.authorizeHttpRequests().antMatchers(HttpMethod.POST, "/v1/**")

@@ -1,13 +1,13 @@
 package com.api.auth.exception;
 
-public class EntityException extends RuntimeException{
+public class UserException extends RuntimeException{
     private final static String MESSAGE = "Dados informado inválido";
 
-    public EntityException() {
+    public UserException() {
         super(MESSAGE);
     }
     
-    public EntityException(String message) {
+    public UserException(String message) {
         super(message);
     }
     
