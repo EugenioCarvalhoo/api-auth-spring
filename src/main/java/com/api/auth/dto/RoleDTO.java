@@ -2,7 +2,6 @@ package com.api.auth.dto;
 
 import com.api.auth.model.RoleModel;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

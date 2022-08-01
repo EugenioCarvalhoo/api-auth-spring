@@ -15,6 +15,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import com.api.auth.filter.CustomAuthenticationFilter;
 import com.api.auth.filter.CustomAuthorizationFilter;
+import com.api.auth.token.Token;
 
 import lombok.RequiredArgsConstructor;
 
@@ -26,6 +27,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final UserDetailsService userDetailsService;
 
     private final PasswordEncoder bCryptPasswordEncoder;
+
+    private final Token token;
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(userDetailsService)
@@ -42,9 +45,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.authorizeHttpRequests().antMatchers(HttpMethod.POST, "/v1/**")
         .hasAnyAuthority("ROLE_USER", "ROLE_ADMIN");
         http.authorizeHttpRequests().anyRequest().authenticated();
-        http.addFilter(new CustomAuthenticationFilter(authenticationManagerBean()));
+        http.addFilter(new CustomAuthenticationFilter(authenticationManagerBean(), token));
         http.addFilterBefore(
-            new CustomAuthorizationFilter(),
+            new CustomAuthorizationFilter(token),
             UsernamePasswordAuthenticationFilter.class);
     }
 

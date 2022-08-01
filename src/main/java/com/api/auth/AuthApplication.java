@@ -1,7 +1,5 @@
 package com.api.auth;
 
-import java.util.ArrayList;
-
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -12,7 +10,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import com.api.auth.dto.RoleDTO;
 import com.api.auth.dto.UserDTO;
 import com.api.auth.model.RoleModel;
-import com.api.auth.model.UserModel;
 import com.api.auth.request.RoleToUserRequest;
 import com.api.auth.service.UserService;
 

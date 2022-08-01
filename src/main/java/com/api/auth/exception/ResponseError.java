@@ -7,6 +7,8 @@ import org.springframework.http.HttpStatus;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+import lombok.Data;
+@Data
 public class ResponseError implements Serializable {
 
 	private static final long serialVersionUID = 1L;

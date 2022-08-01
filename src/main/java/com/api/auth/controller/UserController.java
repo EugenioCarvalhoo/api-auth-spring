@@ -1,19 +1,12 @@
 package com.api.auth.controller;
 
-import java.io.IOException;
 import java.net.URI;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,17 +18,9 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.api.auth.dto.RoleDTO;
 import com.api.auth.dto.UserDTO;
-import com.api.auth.model.RoleModel;
-import com.api.auth.model.UserModel;
 import com.api.auth.request.RoleToUserRequest;
 import com.api.auth.service.UserService;
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.JWTVerifier;
-import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.interfaces.DecodedJWT;
-import com.fasterxml.jackson.core.exc.StreamWriteException;
-import com.fasterxml.jackson.databind.DatabindException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.api.auth.token.Token;
 
 @RestController
 @RequestMapping("/v1")
@@ -43,6 +28,9 @@ public class UserController {
 
     @Autowired
     UserService userService;
+
+    @Autowired
+    Token token;
 
     @PostMapping("/user/save")
     public ResponseEntity<UserDTO> saveUser(@RequestBody UserDTO user) {
@@ -71,38 +59,9 @@ public class UserController {
 
     @GetMapping("/token/refresh")
     public void refreshToken(
-            HttpServletRequest request, HttpServletResponse response) throws StreamWriteException, DatabindException, IOException {
-        String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-        String bearer = "Bearer ";
-        if (authorizationHeader != null &&
-                authorizationHeader.startsWith(bearer)) {
-            try {
-
-                String refreshToken = authorizationHeader.substring(bearer.length());
-                JWTVerifier verifier = JWT.require(Algorithm.HMAC256("secret".getBytes())).build();
-                DecodedJWT decodedJWT = verifier.verify(refreshToken);
-                String username = decodedJWT.getSubject();
-                UserDTO user = userService.getUser(username);
-                String accesToken = createJWT( request, user, 10);
-                
-                Map<String, String> tokens = new HashMap<>();
-                tokens.put("accesToken", accesToken);
-                tokens.put("refreshToken", refreshToken);
-                response.setContentType("application/json");
-                new ObjectMapper().writeValue(response.getOutputStream(), tokens);
-
-            } catch (Exception e) {
-                response.setHeader("error", e.getMessage());
-                response.setStatus(HttpStatus.FORBIDDEN.value());
-                Map<String, String> error = new HashMap<>();
-                error.put("error_message", e.getMessage());
-                response.setContentType("application/json");
-                new ObjectMapper().writeValue(response.getOutputStream(), error);
-
-            }
-        } else {
-            throw new RuntimeException("Refresh token is missing");
-        }
+            HttpServletRequest request, HttpServletResponse response) throws Exception {
+        token.refreshToken(request, response, 
+        userName -> userService.getUser(userName));
 
     }
 
@@ -111,15 +70,4 @@ public class UserController {
                 .path(path).toString());
     }
 
-    private String createJWT(HttpServletRequest request, UserDTO user, Integer minutes) {
-        return JWT.create()
-        .withSubject(user.getUserName())
-        .withClaim("roles", user.getRoles()
-        .stream().map(RoleDTO::getName).collect(Collectors.toList()))
-        .withIssuer(request.getRequestURL().toString())
-        .withExpiresAt(new Date(
-            System.currentTimeMillis() + minutes * 60 * 1000
-        ))
-        .sign(Algorithm.HMAC256("secret".getBytes()));
-    }
 }
